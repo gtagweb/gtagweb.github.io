@@ -10,20 +10,22 @@ init();
 animate();
 
 function init() {
-    // Scene & Camera
+    // Create Scene
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x87CEEB);
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
-    camera.position.set(0, 1.6, 0);
+    scene.background = new THREE.Color(0x87CEEB); // Sky blue
 
-    // Renderer
+    // Create Camera
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 1.6, 3); // Start slightly above the ground
+
+    // Create Renderer
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.xr.enabled = true;
     document.body.appendChild(renderer.domElement);
     document.body.appendChild(VRButton.createButton(renderer));
 
-    // Floor
+    // Create Ground (Green Floor)
     let floor = new THREE.Mesh(
         new THREE.PlaneGeometry(10, 10),
         new THREE.MeshBasicMaterial({ color: 0x00ff00, side: THREE.DoubleSide })
@@ -31,7 +33,7 @@ function init() {
     floor.rotation.x = -Math.PI / 2;
     scene.add(floor);
 
-    // VR Controllers
+    // Create VR Controllers
     controller1 = renderer.xr.getController(0);
     controller2 = renderer.xr.getController(1);
     scene.add(controller1);
@@ -57,7 +59,8 @@ function createHand(controller, hand) {
 }
 
 function animate() {
-    renderer.setAnimationLoop(() => {
+    function renderLoop() {
+        // Apply movement logic
         hands.forEach(({ controller, hand }) => {
             if (isPushing[hand]) {
                 let pushDirection = new THREE.Vector3();
@@ -67,11 +70,19 @@ function animate() {
             }
         });
 
+        // Apply friction to movement
         velocity.multiplyScalar(0.98);
         camera.position.add(velocity);
 
         renderer.render(scene, camera);
-    });
+
+        // Keep the loop running
+        if (!renderer.xr.isPresenting) {
+            requestAnimationFrame(renderLoop); // Run outside of VR
+        }
+    }
+
+    renderer.setAnimationLoop(renderLoop); // Runs in VR mode
 }
 
 function onWindowResize() {
