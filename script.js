@@ -6,10 +6,11 @@ let hands = [];
 let velocity = new THREE.Vector3();
 let isPushing = { left: false, right: false };
 
-init();
-animate();
+document.getElementById('startButton').addEventListener('click', startVR);
 
-function init() {
+function startVR() {
+    document.getElementById('startButton').style.display = 'none'; // Hide button
+
     // Create Scene
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x87CEEB); // Sky blue
@@ -43,6 +44,7 @@ function init() {
     createHand(controller2, 'right');
 
     window.addEventListener('resize', onWindowResize);
+    animate(); // Start the animation loop
 }
 
 function createHand(controller, hand) {
@@ -60,7 +62,6 @@ function createHand(controller, hand) {
 
 function animate() {
     function renderLoop() {
-        // Apply movement logic
         hands.forEach(({ controller, hand }) => {
             if (isPushing[hand]) {
                 let pushDirection = new THREE.Vector3();
@@ -70,15 +71,13 @@ function animate() {
             }
         });
 
-        // Apply friction to movement
         velocity.multiplyScalar(0.98);
         camera.position.add(velocity);
 
         renderer.render(scene, camera);
 
-        // Keep the loop running
         if (!renderer.xr.isPresenting) {
-            requestAnimationFrame(renderLoop); // Run outside of VR
+            requestAnimationFrame(renderLoop); // Run outside VR
         }
     }
 
