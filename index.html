@@ -6,8 +6,14 @@
     <title>Gorilla Tag VR in Browser</title>
     <script type="module" src="script.js"></script>
     <style>
-        body { margin: 0; overflow: hidden; }
+        body { margin: 0; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: black; }
+        #startButton { 
+            font-size: 24px; padding: 20px; border: none; background: green; color: white; 
+            cursor: pointer; border-radius: 10px; position: absolute;
+        }
     </style>
 </head>
-<body></body>
+<body>
+    <button id="startButton">Start VR</button>
+</body>
 </html>
